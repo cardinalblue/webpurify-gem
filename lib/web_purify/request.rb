@@ -85,7 +85,7 @@ module WebPurify
         :path  => request_base[:path],
         :query => WebPurify::Request.to_query(q)
       )
-      res = JSON.parse(WebPurify::Request.post_form(uri, request_base[:scheme]), :symbolize_names => true)[WRAPPER]
+      res = JSON.parse(WebPurify::Request.post_form(uri, request_base[:scheme], form_data), :symbolize_names => true)[WRAPPER]
       if res[:err]
         err_attrs = res[:err][:@attributes]
         raise RequestError.new(err_attrs[:code], err_attrs[:msg])
