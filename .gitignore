@@ -22,3 +22,7 @@ Gemfile.lock
 .ruby-version
 .ruby-gemset
 spec/support/webpurify_api_key.rb
+
+
+# JetBrain IDE
+.idea

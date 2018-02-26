@@ -12,11 +12,13 @@ module WebPurify
     # @return         [Boolean] True if text contains profanity, false if not
     def check(text, options={})
       params = {
-        :method => WebPurify::Constants.methods[:check],
-        :text   => text
+        :method => WebPurify::Constants.methods[:check]
       }
-      parsed = WebPurify::Request.query(text_request_base, @query_base, params.merge(options))
-      return parsed[:found]=='1'
+      form_data = {
+        :text => text
+      }
+      parsed = WebPurify::Request.query_with_post(text_request_base, @query_base, params.merge(options), form_data)
+      return parsed[:found] == '1'
     end
 
 
@@ -27,10 +29,12 @@ module WebPurify
     # @return         [Integer] The number of profane words found in text 
     def check_count(text, options={})
       params = {
-        :method => WebPurify::Constants.methods[:check_count],
-        :text   => text
+        :method => WebPurify::Constants.methods[:check_count]
       }
-      parsed = WebPurify::Request.query(text_request_base, @query_base, params.merge(options))
+      form_data = {
+        :text => text
+      }
+      parsed = WebPurify::Request.query_with_post(text_request_base, @query_base, params.merge(options), form_data)
       return parsed[:found].to_i
     end
 
@@ -44,10 +48,12 @@ module WebPurify
     def replace(text, symbol, options={})
       params = {
         :method        => WebPurify::Constants.methods[:replace],
-        :text          => text,
         :replacesymbol => symbol
       }
-      parsed = WebPurify::Request.query(text_request_base, @query_base, params.merge(options))
+      form_data = {
+        :text => text
+      }
+      parsed = WebPurify::Request.query_with_post(text_request_base, @query_base, params.merge(options), form_data)
       return parsed[:text]
     end
     
@@ -60,9 +66,11 @@ module WebPurify
     def return(text, options={})
       params = {
         :method => WebPurify::Constants.methods[:return],
-        :text   => text
       }
-      parsed = WebPurify::Request.query(text_request_base, @query_base, params.merge(options))
+      form_data = {
+        :text => text
+      }
+      parsed = WebPurify::Request.query_with_post(text_request_base, @query_base, params.merge(options), form_data)
       if parsed[:expletive].is_a?(String)
         return [] << parsed[:expletive]
       else

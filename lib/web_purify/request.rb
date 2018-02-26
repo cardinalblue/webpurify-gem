@@ -70,5 +70,38 @@ module WebPurify
       req.get uri
     end
 
+    # Executes a query to the API endpoint
+    #
+    # @param request_base [Hash] The base parameters for the request (comes from WebPurify::Client initialize())
+    # @param query_base   [Hash] The base parameters for the query (api_key, format)
+    # @param params       [Hash] The unique query parameters
+    # @param form_data    [Hash] The form_data in the body
+    # @return             [Hash] A hash parsed from the JSON response
+    def self.query_with_post(request_base, query_base, params, form_data)
+      q = query_base.merge(params)
+      uri_builder = (request_base[:scheme]=='https') ? URI::HTTPS : URI::HTTP
+      uri = uri_builder.build(
+        :host  => request_base[:host],
+        :path  => request_base[:path],
+        :query => WebPurify::Request.to_query(q)
+      )
+      res = JSON.parse(WebPurify::Request.post_form(uri, request_base[:scheme], form_data), :symbolize_names => true)[WRAPPER]
+      if res[:err]
+        err_attrs = res[:err][:@attributes]
+        raise RequestError.new(err_attrs[:code], err_attrs[:msg])
+      else
+        res
+      end
+    end
+
+    # Handles making the query according to http or https scheme
+    #
+    # @param uri    [String] The uri to be queried
+    # @param scheme [String] The scheme (http, https)
+    # @return       [String] The JSON request response
+    def self.post_form(uri, scheme, form_data)
+      req = (scheme=='https') ? Net::HTTPS : Net::HTTP
+      req.post_form(uri, form_data).body
+    end
   end
 end
